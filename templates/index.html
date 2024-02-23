@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Portfolio</title>
+    <link rel="stylesheet" type="text/css" href="../static/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="header-text">
+                </h2><strong>Me chamo Manuela, e estou ingressando na área de desenvolvimento<br><br></h2>
+                <p>
+                    <strong>Chatbots Personalizados </strong> - Exploro a criação de chatbots para transformar ideias em interações envolventes.
+                </p>
+                <p>
+                    <strong>Integrações </strong> - Tenho experiência na construção de integrações com bancos de dados e APIs.
+                </p>
+                <p>
+                    <strong>Automatização</strong> - Estou aprimorando minhas habilidades em automatização usando Python.
+                </p>
+                <p><br><br>
+                    <a href="https://www.linkedin.com/in/manuela-marques-pinho-230aa4245/">
+                        <img src="../static/linkedln.png" alt="LinkedIn Logo" class="logo">
+                    </a>
+                    <a href="https://github.com/Manuela1908">
+                        <img src="../static/git.png" alt="GitHub Logo" class="logo">
+                    </a>
+                    <a href="mailto:manuelapinho0518@gmail.com">
+                        <img src="../static/email.png" alt="Email Logo" class="logo">
+                    </a>
+                </p>
+            </div>
+        <div class="projects-list">
+                    <p>
+                        <hr>
+                        <h2>Você pode explorar alguns dos meus projetos abaixo:</h2><br><br>
+                        <button onclick="openScriptDescription('script1')">Gerador <br>de<br> Receitas</button>
+                        <button onclick="openScriptDescription('script2')">PDF <br>→<br> Tabela</button>
+                        <button onclick="openScriptDescription('script3')">Script 3</button>
+                     </p>
+                </div>
+        </div>
+
+        
+        
+    </header>
+
+    <section class="dark-mode">
+        <div id="scriptContainer">
+            <div id="scriptDescriptions">
+                <div id="script1Description" style="display: none;">
+                    <p>Script gerador de receitas baseado na entrada do usuário.</p><br>
+                    <input type="text" id="receita" name="receita">
+                    <button onclick="gerarReceita()">
+                        <span id="loading-spinner" style="display: none;"></span><span id="button-text">Gerar</span>
+                    </button>
+                    <br><br>
+                    <div id="resultado"></div>
+                    <br><br>
+                    <label id="reportarErroBtn" onclick="reportarErro()" style="display: none;">Sinto muito pelo ocorrido, mas não se preocupe! O problema foi reportado.</label>
+                </div>
+                <div id="script2Description" style="display: none;">
+                    <p>Descrição do Script 2: [Sua descrição aqui]</p>
+                </div>
+                <div id="script3Description" style="display: none;">
+                    <p>Descrição do Script 3: [Sua descrição aqui]</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function openScriptDescription(scriptId) {
+            var scriptDescriptions = document.getElementById("scriptDescriptions").children;
+    
+            for (var i = 0; i < scriptDescriptions.length; i++) {
+                scriptDescriptions[i].style.display = "none";
+            }
+    
+            var scriptDescription = document.getElementById(scriptId + "Description");
+            if (scriptDescription) {
+                scriptDescription.style.display = "block";
+                scriptDescription.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    </script>
+
+    <footer class="dark-mode">
+        &copy; 2024 Manuela. Todos os direitos reservados.
+    </footer>
+
+
+    <script>
+        function gerarReceita() {
+            var spinner = document.getElementById("loading-spinner");
+            var buttonText = document.getElementById("button-text");
+        
+            spinner.style.display = "inline-block";
+            buttonText.style.display = "none";
+        
+            var receita = document.getElementById("receita").value;
+        
+            fetch("/gerar_receita", {
+                method: "POST",
+                body: new URLSearchParams({ "receita": receita }),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erro na requisição. Status: ${response.status}, Mensagem: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById("resultado").innerText = data.receita;
+            })
+            .catch(error => {
+                document.getElementById("resultado").innerText = error.message;
+                document.getElementById("reportarErroBtn").style.display = "inline";
+            })
+            .finally(() => {
+                spinner.style.display = "none";
+                buttonText.style.display = "inline-block";
+            });
+        }
+        
+        function reportarErro(descricaoErro) {
+            fetch("/reportar_erro", {
+                method: "POST",
+                body: new URLSearchParams({ "descricao_erro": descricaoErro }),
+                headers: {
+                    "Content-Type":  "application/x-www-form-urlencoded"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.mensagem);
+            })
+            .catch(error => {
+                console.log("Erro ao enviar relatório de erro. Tente novamente.");
+            });
+        }
+</body>
+</html>
